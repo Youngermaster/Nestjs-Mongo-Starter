@@ -67,17 +67,20 @@ pnpm run docker:dev
 ```
 
 This will start:
+
 - MongoDB on `localhost:27017`
 - Mongo Express on `localhost:8081` (admin/admin123)
 
 ### 4. Run the Application
 
 Development mode:
+
 ```bash
 pnpm run start:dev
 ```
 
 Production build:
+
 ```bash
 pnpm run build
 pnpm run start:prod
@@ -91,20 +94,20 @@ pnpm run start:prod
 
 ## Environment Variables
 
-| Variable | Description | Example | Required |
-|----------|-------------|---------|----------|
-| `NODE_ENV` | Environment | `development` | No |
-| `PORT` | Application port | `3000` | No |
-| `API_PREFIX` | API prefix | `api` | No |
-| `MONGODB_URI` | MongoDB connection string | `mongodb://admin:password123@localhost:27017/nestjs-starter?authSource=admin` | Yes |
-| `JWT_ACCESS_SECRET` | Access token secret (32+ chars) | Generated value | Yes |
-| `JWT_REFRESH_SECRET` | Refresh token secret (32+ chars) | Generated value | Yes |
-| `JWT_ACCESS_EXPIRES_IN` | Access token expiration | `15m` | No |
-| `JWT_REFRESH_EXPIRES_IN` | Refresh token expiration | `7d` | No |
-| `BCRYPT_SALT_ROUNDS` | Password hashing rounds | `10` | No |
-| `SWAGGER_ENABLED` | Enable Swagger UI | `true` | No |
-| `CORS_ENABLED` | Enable CORS | `true` | No |
-| `CORS_ORIGIN` | CORS allowed origins | `*` | No |
+| Variable                 | Description                      | Example                                                                       | Required |
+| ------------------------ | -------------------------------- | ----------------------------------------------------------------------------- | -------- |
+| `NODE_ENV`               | Environment                      | `development`                                                                 | No       |
+| `PORT`                   | Application port                 | `3000`                                                                        | No       |
+| `API_PREFIX`             | API prefix                       | `api`                                                                         | No       |
+| `MONGODB_URI`            | MongoDB connection string        | `mongodb://admin:password123@localhost:27017/nestjs-starter?authSource=admin` | Yes      |
+| `JWT_ACCESS_SECRET`      | Access token secret (32+ chars)  | Generated value                                                               | Yes      |
+| `JWT_REFRESH_SECRET`     | Refresh token secret (32+ chars) | Generated value                                                               | Yes      |
+| `JWT_ACCESS_EXPIRES_IN`  | Access token expiration          | `15m`                                                                         | No       |
+| `JWT_REFRESH_EXPIRES_IN` | Refresh token expiration         | `7d`                                                                          | No       |
+| `BCRYPT_SALT_ROUNDS`     | Password hashing rounds          | `10`                                                                          | No       |
+| `SWAGGER_ENABLED`        | Enable Swagger UI                | `true`                                                                        | No       |
+| `CORS_ENABLED`           | Enable CORS                      | `true`                                                                        | No       |
+| `CORS_ORIGIN`            | CORS allowed origins             | `*`                                                                           | No       |
 
 ## Project Structure
 
@@ -117,6 +120,7 @@ The project follows a feature-based modular architecture:
 - **tasks/** - Task management module (example domain)
 
 Each module contains:
+
 - **schemas/** - Mongoose schemas
 - **dto/** - Data Transfer Objects with validation
 - **repository.ts** - Data access layer
@@ -131,11 +135,13 @@ Each module contains:
 Separates data access from business logic:
 
 src/users/users.repository.ts:1
+
 - Data access operations
 - MongoDB query execution
 - Database-specific logic
 
 src/users/users.service.ts:1
+
 - Business logic
 - DTO transformation
 - Error handling
@@ -170,11 +176,13 @@ Standardized responses using global interceptor:
 ## Security Features
 
 ### Password Security
+
 - bcrypt hashing with 10 salt rounds
 - Password complexity requirements
 - Passwords excluded from queries (`select: false`)
 
 ### JWT Authentication
+
 - **Access Tokens**: 15-minute expiration
 - **Refresh Tokens**: 7-day expiration
 - **Token Rotation**: Refresh tokens rotated on use
@@ -182,6 +190,7 @@ Standardized responses using global interceptor:
 - **Metadata Tracking**: IP address and user agent logged
 
 ### HTTP Security
+
 - Helmet for security headers
 - CORS configuration
 - Input validation on all endpoints
@@ -190,6 +199,7 @@ Standardized responses using global interceptor:
 ## Database Schema
 
 ### User Model
+
 - email (unique, indexed)
 - firstName, lastName
 - password (hashed, select: false)
@@ -198,6 +208,7 @@ Standardized responses using global interceptor:
 - createdAt, updatedAt (timestamps)
 
 ### RefreshToken Model
+
 - userId (ref: User)
 - token (unique, indexed)
 - expiresAt (with TTL index)
@@ -205,6 +216,7 @@ Standardized responses using global interceptor:
 - userAgent, ipAddress
 
 ### Task Model
+
 - title, description
 - status (TODO, IN_PROGRESS, COMPLETED, ARCHIVED)
 - priority (LOW, MEDIUM, HIGH, URGENT)
@@ -216,32 +228,32 @@ Standardized responses using global interceptor:
 
 ### Authentication
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | Register new user |
-| POST | `/api/auth/login` | Login user |
-| POST | `/api/auth/refresh` | Refresh access token |
-| POST | `/api/auth/logout` | Logout user |
+| Method | Endpoint             | Description          |
+| ------ | -------------------- | -------------------- |
+| POST   | `/api/auth/register` | Register new user    |
+| POST   | `/api/auth/login`    | Login user           |
+| POST   | `/api/auth/refresh`  | Refresh access token |
+| POST   | `/api/auth/logout`   | Logout user          |
 
 ### Users
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/api/users/me` | Get current user | Protected |
-| GET | `/api/users` | List users | Admin |
-| GET | `/api/users/:id` | Get user by ID | Admin |
-| PUT | `/api/users/:id` | Update user | Protected |
-| DELETE | `/api/users/:id` | Delete user | Admin |
+| Method | Endpoint         | Description      | Auth      |
+| ------ | ---------------- | ---------------- | --------- |
+| GET    | `/api/users/me`  | Get current user | Protected |
+| GET    | `/api/users`     | List users       | Admin     |
+| GET    | `/api/users/:id` | Get user by ID   | Admin     |
+| PUT    | `/api/users/:id` | Update user      | Protected |
+| DELETE | `/api/users/:id` | Delete user      | Admin     |
 
 ### Tasks
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| POST | `/api/tasks` | Create task | Protected |
-| GET | `/api/tasks` | List tasks (with filters) | Protected |
-| GET | `/api/tasks/:id` | Get task | Protected |
-| PUT | `/api/tasks/:id` | Update task | Protected |
-| DELETE | `/api/tasks/:id` | Delete task | Protected |
+| Method | Endpoint         | Description               | Auth      |
+| ------ | ---------------- | ------------------------- | --------- |
+| POST   | `/api/tasks`     | Create task               | Protected |
+| GET    | `/api/tasks`     | List tasks (with filters) | Protected |
+| GET    | `/api/tasks/:id` | Get task                  | Protected |
+| PUT    | `/api/tasks/:id` | Update task               | Protected |
+| DELETE | `/api/tasks/:id` | Delete task               | Protected |
 
 ### Example Usage
 
@@ -289,6 +301,7 @@ pnpm run docker:logs   # View MongoDB logs
 ```
 
 Access Mongo Express at `http://localhost:8081`:
+
 - Username: `admin`
 - Password: `admin123`
 
@@ -309,7 +322,3 @@ Access Mongo Express at `http://localhost:8081`:
 - Health check endpoint
 - Docker support
 - TypeScript strict mode
-
-## License
-
-UNLICENSED
