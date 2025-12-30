@@ -22,13 +22,10 @@ import { CreateTaskDto } from './dto/create-task.dto.js';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
 import { QueryTaskDto } from './dto/query-task.dto.js';
 import { TaskResponseDto } from './dto/task-response.dto.js';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
-import { CurrentUser } from '../common/decorators/current-user.decorator.js';
-import type { UserDocument } from '../users/schemas/user.schema.js';
+import { Session, UserSession } from '@thallesp/nestjs-better-auth';
 
 @ApiTags('tasks')
 @Controller('tasks')
-@UseGuards(JwtAuthGuard)
 @ApiBearerAuth('JWT-auth')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
@@ -41,10 +38,10 @@ export class TasksController {
     type: TaskResponseDto,
   })
   async create(
-    @CurrentUser() user: UserDocument,
+    @Session() session: UserSession,
     @Body() createTaskDto: CreateTaskDto,
   ): Promise<TaskResponseDto> {
-    return this.tasksService.create(user._id.toString(), createTaskDto);
+    return this.tasksService.create(session.user.id, createTaskDto);
   }
 
   @Get()
@@ -55,10 +52,10 @@ export class TasksController {
     type: [TaskResponseDto],
   })
   async findAll(
-    @CurrentUser() user: UserDocument,
+    @Session() session: UserSession,
     @Query() queryDto: QueryTaskDto,
   ) {
-    return this.tasksService.findAll(user._id.toString(), queryDto);
+    return this.tasksService.findAll(session.user.id, queryDto);
   }
 
   @Get(':id')
@@ -70,10 +67,10 @@ export class TasksController {
   })
   @ApiResponse({ status: 404, description: 'Task not found' })
   async findOne(
-    @CurrentUser() user: UserDocument,
+    @Session() session: UserSession,
     @Param('id') id: string,
   ): Promise<TaskResponseDto> {
-    return this.tasksService.findOne(user._id.toString(), id);
+    return this.tasksService.findOne(session.user.id, id);
   }
 
   @Put(':id')
@@ -85,11 +82,11 @@ export class TasksController {
   })
   @ApiResponse({ status: 404, description: 'Task not found' })
   async update(
-    @CurrentUser() user: UserDocument,
+    @Session() session: UserSession,
     @Param('id') id: string,
     @Body() updateTaskDto: UpdateTaskDto,
   ): Promise<TaskResponseDto> {
-    return this.tasksService.update(user._id.toString(), id, updateTaskDto);
+    return this.tasksService.update(session.user.id, id, updateTaskDto);
   }
 
   @Delete(':id')
@@ -98,9 +95,9 @@ export class TasksController {
   @ApiResponse({ status: 204, description: 'Task deleted successfully' })
   @ApiResponse({ status: 404, description: 'Task not found' })
   async remove(
-    @CurrentUser() user: UserDocument,
+    @Session() session: UserSession,
     @Param('id') id: string,
   ): Promise<void> {
-    await this.tasksService.remove(user._id.toString(), id);
+    await this.tasksService.remove(session.user.id, id);
   }
 }

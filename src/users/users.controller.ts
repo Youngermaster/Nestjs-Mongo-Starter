@@ -20,16 +20,13 @@ import { UsersService } from './users.service.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { UserResponseDto } from './dto/user-response.dto.js';
 import { QueryUserDto } from './dto/query-user.dto.js';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
-import { CurrentUser } from '../common/decorators/current-user.decorator.js';
-import type { UserDocument } from './schemas/user.schema.js';
-import { Roles } from '../common/decorators/roles.decorator.js';
+import { Session, UserSession, Roles } from '@thallesp/nestjs-better-auth';
 import { RolesGuard } from '../common/guards/roles.guard.js';
 import { Role } from '../common/constants/role.enum.js';
 
 @ApiTags('users')
 @Controller('users')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(RolesGuard)
 @ApiBearerAuth('JWT-auth')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -42,13 +39,13 @@ export class UsersController {
     type: UserResponseDto,
   })
   async getProfile(
-    @CurrentUser() user: UserDocument,
+    @Session() session: UserSession,
   ): Promise<UserResponseDto> {
-    return this.usersService.findOne(user._id.toString());
+    return this.usersService.findOne(session.user.id);
   }
 
   @Get()
-  @Roles(Role.ADMIN)
+  @Roles([Role.ADMIN])
   @ApiOperation({ summary: 'Get all users (Admin only)' })
   @ApiResponse({
     status: 200,
@@ -60,7 +57,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  @Roles(Role.ADMIN)
+  @Roles([Role.ADMIN])
   @ApiOperation({ summary: 'Get user by ID (Admin only)' })
   @ApiResponse({
     status: 200,
@@ -83,11 +80,15 @@ export class UsersController {
   async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-    @CurrentUser() currentUser: UserDocument,
+    @Session() session: UserSession,
   ): Promise<UserResponseDto> {
+    const userRoles = Array.isArray(session.user.role)
+      ? session.user.role
+      : session.user.role ? [session.user.role] : [];
+
     if (
-      id !== currentUser._id.toString() &&
-      !currentUser.roles.includes(Role.ADMIN)
+      id !== session.user.id &&
+      !userRoles.includes(Role.ADMIN)
     ) {
       throw new Error('You can only update your own profile');
     }
@@ -95,7 +96,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @Roles(Role.ADMIN)
+  @Roles([Role.ADMIN])
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete user (Admin only)' })
   @ApiResponse({ status: 204, description: 'User deleted' })

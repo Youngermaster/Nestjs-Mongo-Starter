@@ -1,14 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AppService } from './app.service.js';
-import { Public } from './common/decorators/public.decorator.js';
+import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 
 @ApiTags('app')
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Public()
+  @AllowAnonymous()
   @Get()
   @ApiOperation({ summary: 'Get API information' })
   @ApiResponse({ status: 200, description: 'API information' })
@@ -16,7 +16,7 @@ export class AppController {
     return this.appService.getApiInfo();
   }
 
-  @Public()
+  @AllowAnonymous()
   @Get('health')
   @ApiOperation({ summary: 'Health check endpoint' })
   @ApiResponse({ status: 200, description: 'Service is healthy' })

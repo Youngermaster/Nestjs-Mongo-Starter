@@ -18,4 +18,15 @@ export const validationSchema = Joi.object({
   SWAGGER_ENABLED: Joi.boolean().default(true),
   CORS_ENABLED: Joi.boolean().default(true),
   CORS_ORIGIN: Joi.string().default('*'),
+
+  // GitHub OAuth
+  GITHUB_CLIENT_ID: Joi.string().optional(),
+  GITHUB_CLIENT_SECRET: Joi.string().optional(),
+  GITHUB_CALLBACK_URL: Joi.string().uri().optional(),
+
+  // Microsoft 365 OAuth
+  AZURE_AD_CLIENT_ID: Joi.string().optional(),
+  AZURE_AD_CLIENT_SECRET: Joi.string().optional(),
+  AZURE_AD_TENANT_ID: Joi.string().default('common'),
+  AZURE_AD_CALLBACK_URL: Joi.string().uri().optional(),
 });

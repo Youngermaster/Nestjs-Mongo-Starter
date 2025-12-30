@@ -7,9 +7,12 @@ import { UsersModule } from './users/users.module.js';
 import { TasksModule } from './tasks/tasks.module.js';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './common/guards/jwt-auth.guard.js';
 
+/**
+ * Root application module
+ * BetterAuth provides global authentication guard automatically
+ * Use @AllowAnonymous() decorator to make routes public
+ */
 @Module({
   imports: [
     ConfigModule,
@@ -24,12 +27,6 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard.js';
     TasksModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-  ],
+  providers: [AppService],
 })
 export class AppModule {}

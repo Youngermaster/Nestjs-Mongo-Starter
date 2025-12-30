@@ -32,6 +32,24 @@ export interface CorsConfig {
   origin: string;
 }
 
+export interface OAuthGitHubConfig {
+  clientId?: string;
+  clientSecret?: string;
+  callbackUrl?: string;
+}
+
+export interface OAuthMicrosoftConfig {
+  clientId?: string;
+  clientSecret?: string;
+  tenantId: string;
+  callbackUrl?: string;
+}
+
+export interface OAuthConfig {
+  github: OAuthGitHubConfig;
+  microsoft: OAuthMicrosoftConfig;
+}
+
 export interface Configuration {
   app: AppConfig;
   database: DatabaseConfig;
@@ -39,4 +57,5 @@ export interface Configuration {
   bcrypt: BcryptConfig;
   swagger: SwaggerConfig;
   cors: CorsConfig;
+  oauth: OAuthConfig;
 }
