@@ -8,7 +8,10 @@ import { UserDocument } from '../../users/schemas/user.schema.js';
 import { UsersRepository } from '../../users/users.repository.js';
 
 @Injectable()
-export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
+export class JwtRefreshStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-refresh',
+) {
   constructor(
     private readonly configService: ConfigService,
     private readonly usersRepository: UsersRepository,
@@ -21,7 +24,10 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
     });
   }
 
-  async validate(req: any, payload: RefreshTokenPayload): Promise<UserDocument> {
+  async validate(
+    req: any,
+    payload: RefreshTokenPayload,
+  ): Promise<UserDocument> {
     const user = await this.usersRepository.findById(payload.sub);
 
     if (!user || !user.isActive) {

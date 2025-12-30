@@ -11,7 +11,10 @@ import { MESSAGES } from '../common/constants/messages.constant.js';
 export class TasksService {
   constructor(private readonly tasksRepository: TasksRepository) {}
 
-  async create(userId: string, createTaskDto: CreateTaskDto): Promise<TaskResponseDto> {
+  async create(
+    userId: string,
+    createTaskDto: CreateTaskDto,
+  ): Promise<TaskResponseDto> {
     const task = await this.tasksRepository.create(userId, createTaskDto);
     const taskObj: any = task.toObject();
     return {
@@ -22,7 +25,16 @@ export class TasksService {
   }
 
   async findAll(userId: string, queryDto: QueryTaskDto) {
-    const { page = 1, limit = 10, sortBy, sortOrder, status, priority, search, tags } = queryDto;
+    const {
+      page = 1,
+      limit = 10,
+      sortBy,
+      sortOrder,
+      status,
+      priority,
+      search,
+      tags,
+    } = queryDto;
 
     const filter: any = {};
 

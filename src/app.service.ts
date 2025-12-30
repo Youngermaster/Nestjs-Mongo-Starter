@@ -6,7 +6,8 @@ export class AppService {
     return {
       name: 'NestJS MongoDB Starter API',
       version: '1.0.0',
-      description: 'Enterprise-grade NestJS starter with MongoDB, JWT authentication, and Swagger',
+      description:
+        'Enterprise-grade NestJS starter with MongoDB, JWT authentication, and Swagger',
       endpoints: {
         documentation: '/api/docs',
         health: '/api/health',

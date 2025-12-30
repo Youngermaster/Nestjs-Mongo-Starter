@@ -9,7 +9,10 @@ export class QueryTaskDto extends PaginationDto {
   @IsOptional()
   status?: TaskStatus;
 
-  @ApiPropertyOptional({ enum: TaskPriority, description: 'Filter by priority' })
+  @ApiPropertyOptional({
+    enum: TaskPriority,
+    description: 'Filter by priority',
+  })
   @IsEnum(TaskPriority)
   @IsOptional()
   priority?: TaskPriority;

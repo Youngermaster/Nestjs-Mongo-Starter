@@ -19,9 +19,7 @@ export class LoggingInterceptor implements NestInterceptor {
 
     const userInfo = user ? `User: ${user.email}` : 'Anonymous';
 
-    this.logger.log(
-      `Incoming Request: ${method} ${url} - ${userInfo}`,
-    );
+    this.logger.log(`Incoming Request: ${method} ${url} - ${userInfo}`);
 
     return next.handle().pipe(
       tap(() => {

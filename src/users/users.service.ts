@@ -33,7 +33,14 @@ export class UsersService {
   }
 
   async findAll(queryDto: QueryUserDto) {
-    const { page = 1, limit = 10, sortBy, sortOrder, email, isActive } = queryDto;
+    const {
+      page = 1,
+      limit = 10,
+      sortBy,
+      sortOrder,
+      email,
+      isActive,
+    } = queryDto;
 
     const filter: any = {};
     if (email) filter.email = email;
@@ -86,7 +93,10 @@ export class UsersService {
     });
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
     const user = await this.usersRepository.update(id, updateUserDto);
 
     if (!user) {

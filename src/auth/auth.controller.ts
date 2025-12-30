@@ -103,7 +103,10 @@ export class AuthController {
     @CurrentUser() user: UserDocument,
     @Body() refreshTokenDto: RefreshTokenDto,
   ) {
-    await this.authService.logout(user._id.toString(), refreshTokenDto.refreshToken);
+    await this.authService.logout(
+      user._id.toString(),
+      refreshTokenDto.refreshToken,
+    );
     return { message: 'Logout successful' };
   }
 }

@@ -1,7 +1,13 @@
-import { ApiResponse, PaginatedResponse } from '../interfaces/api-response.interface.js';
+import {
+  ApiResponse,
+  PaginatedResponse,
+} from '../interfaces/api-response.interface.js';
 
 export class ResponseUtil {
-  static success<T>(data: T, message?: string): Omit<ApiResponse<T>, 'timestamp' | 'path'> {
+  static success<T>(
+    data: T,
+    message?: string,
+  ): Omit<ApiResponse<T>, 'timestamp' | 'path'> {
     return {
       success: true,
       data,

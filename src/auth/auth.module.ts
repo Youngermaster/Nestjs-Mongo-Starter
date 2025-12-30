@@ -7,7 +7,10 @@ import { AuthService } from './auth.service.js';
 import { AuthController } from './auth.controller.js';
 import { JwtStrategy } from './strategies/jwt.strategy.js';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy.js';
-import { RefreshToken, RefreshTokenSchema } from './schemas/refresh-token.schema.js';
+import {
+  RefreshToken,
+  RefreshTokenSchema,
+} from './schemas/refresh-token.schema.js';
 import { UsersModule } from '../users/users.module.js';
 
 @Module({

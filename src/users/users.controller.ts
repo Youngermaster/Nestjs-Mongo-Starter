@@ -41,7 +41,9 @@ export class UsersController {
     description: 'Current user profile',
     type: UserResponseDto,
   })
-  async getProfile(@CurrentUser() user: UserDocument): Promise<UserResponseDto> {
+  async getProfile(
+    @CurrentUser() user: UserDocument,
+  ): Promise<UserResponseDto> {
     return this.usersService.findOne(user._id.toString());
   }
 
@@ -83,7 +85,10 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
     @CurrentUser() currentUser: UserDocument,
   ): Promise<UserResponseDto> {
-    if (id !== currentUser._id.toString() && !currentUser.roles.includes(Role.ADMIN)) {
+    if (
+      id !== currentUser._id.toString() &&
+      !currentUser.roles.includes(Role.ADMIN)
+    ) {
       throw new Error('You can only update your own profile');
     }
     return this.usersService.update(id, updateUserDto);

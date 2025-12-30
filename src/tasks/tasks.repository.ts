@@ -7,15 +7,18 @@ import { UpdateTaskDto } from './dto/update-task.dto.js';
 
 @Injectable()
 export class TasksRepository {
-  constructor(
-    @InjectModel(Task.name) private taskModel: Model<TaskDocument>,
-  ) {}
+  constructor(@InjectModel(Task.name) private taskModel: Model<TaskDocument>) {}
 
-  async create(userId: string, createTaskDto: CreateTaskDto): Promise<TaskDocument> {
+  async create(
+    userId: string,
+    createTaskDto: CreateTaskDto,
+  ): Promise<TaskDocument> {
     const task = new this.taskModel({
       ...createTaskDto,
       userId: new Types.ObjectId(userId),
-      dueDate: createTaskDto.dueDate ? new Date(createTaskDto.dueDate) : undefined,
+      dueDate: createTaskDto.dueDate
+        ? new Date(createTaskDto.dueDate)
+        : undefined,
     });
     return task.save();
   }
@@ -37,7 +40,10 @@ export class TasksRepository {
       updateData.dueDate = new Date(updateTaskDto.dueDate);
     }
 
-    if (updateTaskDto.status === TaskStatus.COMPLETED && !updateData.completedAt) {
+    if (
+      updateTaskDto.status === TaskStatus.COMPLETED &&
+      !updateData.completedAt
+    ) {
       updateData.completedAt = new Date();
     }
 

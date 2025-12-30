@@ -14,8 +14,14 @@ import { LoginDto } from './dto/login.dto.js';
 import { AuthResponseDto } from './dto/auth-response.dto.js';
 import { UserResponseDto } from '../users/dto/user-response.dto.js';
 import { BcryptUtil } from '../common/utils/bcrypt.util.js';
-import { JwtPayload, RefreshTokenPayload } from '../common/interfaces/jwt-payload.interface.js';
-import { RefreshToken, RefreshTokenDocument } from './schemas/refresh-token.schema.js';
+import {
+  JwtPayload,
+  RefreshTokenPayload,
+} from '../common/interfaces/jwt-payload.interface.js';
+import {
+  RefreshToken,
+  RefreshTokenDocument,
+} from './schemas/refresh-token.schema.js';
 import { MESSAGES } from '../common/constants/messages.constant.js';
 
 @Injectable()
@@ -28,22 +34,37 @@ export class AuthService {
     private refreshTokenModel: Model<RefreshTokenDocument>,
   ) {}
 
-  async register(registerDto: RegisterDto, userAgent?: string, ipAddress?: string): Promise<AuthResponseDto> {
-    const existingUser = await this.usersRepository.findByEmail(registerDto.email);
+  async register(
+    registerDto: RegisterDto,
+    userAgent?: string,
+    ipAddress?: string,
+  ): Promise<AuthResponseDto> {
+    const existingUser = await this.usersRepository.findByEmail(
+      registerDto.email,
+    );
 
     if (existingUser) {
       throw new ConflictException(MESSAGES.AUTH.EMAIL_ALREADY_EXISTS);
     }
 
     const saltRounds = this.configService.get<number>('bcrypt.saltRounds')!;
-    const hashedPassword = await BcryptUtil.hash(registerDto.password, saltRounds);
+    const hashedPassword = await BcryptUtil.hash(
+      registerDto.password,
+      saltRounds,
+    );
 
     const user = await this.usersRepository.create({
       ...registerDto,
       password: hashedPassword,
     });
 
-    const tokens = await this.generateTokens(user._id.toString(), user.email, user.roles, userAgent, ipAddress);
+    const tokens = await this.generateTokens(
+      user._id.toString(),
+      user.email,
+      user.roles,
+      userAgent,
+      ipAddress,
+    );
 
     const userObj = user.toObject();
 
@@ -59,14 +80,21 @@ export class AuthService {
     };
   }
 
-  async login(loginDto: LoginDto, userAgent?: string, ipAddress?: string): Promise<AuthResponseDto> {
+  async login(
+    loginDto: LoginDto,
+    userAgent?: string,
+    ipAddress?: string,
+  ): Promise<AuthResponseDto> {
     const user = await this.usersRepository.findByEmail(loginDto.email, true);
 
     if (!user) {
       throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
 
-    const isPasswordValid = await BcryptUtil.compare(loginDto.password, user.password);
+    const isPasswordValid = await BcryptUtil.compare(
+      loginDto.password,
+      user.password,
+    );
 
     if (!isPasswordValid) {
       throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
@@ -78,7 +106,13 @@ export class AuthService {
 
     await this.usersRepository.updateLastLogin(user._id.toString());
 
-    const tokens = await this.generateTokens(user._id.toString(), user.email, user.roles, userAgent, ipAddress);
+    const tokens = await this.generateTokens(
+      user._id.toString(),
+      user.email,
+      user.roles,
+      userAgent,
+      ipAddress,
+    );
 
     const userObject: any = user.toObject();
 
@@ -94,11 +128,16 @@ export class AuthService {
     };
   }
 
-  async refreshToken(refreshTokenString: string): Promise<{ accessToken: string; refreshToken: string }> {
+  async refreshToken(
+    refreshTokenString: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     try {
-      const payload = this.jwtService.verify<RefreshTokenPayload>(refreshTokenString, {
-        secret: this.configService.get<string>('jwt.refreshSecret'),
-      });
+      const payload = this.jwtService.verify<RefreshTokenPayload>(
+        refreshTokenString,
+        {
+          secret: this.configService.get<string>('jwt.refreshSecret'),
+        },
+      );
 
       const storedToken = await this.refreshTokenModel
         .findOne({
@@ -125,7 +164,11 @@ export class AuthService {
         throw new UnauthorizedException('User not found or inactive');
       }
 
-      const newAccessToken = this.generateAccessToken(payload.sub, user.email, user.roles);
+      const newAccessToken = this.generateAccessToken(
+        payload.sub,
+        user.email,
+        user.roles,
+      );
 
       const newRefreshToken = await this.rotateRefreshToken(storedToken);
 
@@ -155,12 +198,20 @@ export class AuthService {
     ipAddress?: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const accessToken = this.generateAccessToken(userId, email, roles);
-    const refreshToken = await this.createRefreshToken(userId, userAgent, ipAddress);
+    const refreshToken = await this.createRefreshToken(
+      userId,
+      userAgent,
+      ipAddress,
+    );
 
     return { accessToken, refreshToken };
   }
 
-  private generateAccessToken(userId: string, email: string, roles: string[]): string {
+  private generateAccessToken(
+    userId: string,
+    email: string,
+    roles: string[],
+  ): string {
     const payload: JwtPayload = {
       sub: userId,
       email,
@@ -186,7 +237,9 @@ export class AuthService {
       type: 'refresh',
     };
 
-    const refreshExpiresIn = this.configService.get<string>('jwt.refreshExpiresIn')!;
+    const refreshExpiresIn = this.configService.get<string>(
+      'jwt.refreshExpiresIn',
+    )!;
     const token = this.jwtService.sign(payload as any, {
       secret: this.configService.get<string>('jwt.refreshSecret')!,
       expiresIn: refreshExpiresIn as any,
@@ -206,9 +259,14 @@ export class AuthService {
     return token;
   }
 
-  private async rotateRefreshToken(oldToken: RefreshTokenDocument): Promise<string> {
+  private async rotateRefreshToken(
+    oldToken: RefreshTokenDocument,
+  ): Promise<string> {
     await this.refreshTokenModel
-      .updateOne({ _id: oldToken._id }, { isRevoked: true, revokedAt: new Date() })
+      .updateOne(
+        { _id: oldToken._id },
+        { isRevoked: true, revokedAt: new Date() },
+      )
       .exec();
 
     return this.createRefreshToken(
