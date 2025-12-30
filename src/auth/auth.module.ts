@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import type { StringValue } from 'ms';
 import { AuthService } from './auth.service.js';
 import { AuthController } from './auth.controller.js';
 import { JwtStrategy } from './strategies/jwt.strategy.js';
@@ -19,12 +20,15 @@ import { UsersModule } from '../users/users.module.js';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('jwt.accessSecret')!,
-        signOptions: {
-          expiresIn: configService.get<string>('jwt.accessExpiresIn')!,
-        },
-      }),
+      useFactory: (configService: ConfigService) => {
+        const expiresIn = configService.get<string>('jwt.accessExpiresIn')!;
+        return {
+          secret: configService.get<string>('jwt.accessSecret')!,
+          signOptions: {
+            expiresIn: expiresIn as StringValue | number,
+          },
+        };
+      },
       inject: [ConfigService],
     }),
     MongooseModule.forFeature([

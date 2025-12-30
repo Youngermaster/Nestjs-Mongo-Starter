@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import type { StringValue } from 'ms';
 import { UsersRepository } from '../users/users.repository.js';
 import { RegisterDto } from './dto/register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
@@ -17,6 +18,7 @@ import {
   JwtPayload,
   RefreshTokenPayload,
 } from '../common/interfaces/jwt-payload.interface.js';
+import { Role } from '../common/constants/role.enum.js';
 import {
   RefreshToken,
   RefreshTokenDocument,
@@ -198,7 +200,7 @@ export class AuthService {
   private async generateTokens(
     userId: string,
     email: string,
-    roles: string[],
+    roles: Role[],
     userAgent?: string,
     ipAddress?: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
@@ -215,7 +217,7 @@ export class AuthService {
   private generateAccessToken(
     userId: string,
     email: string,
-    roles: string[],
+    roles: Role[],
   ): string {
     const payload: JwtPayload = {
       sub: userId,
@@ -223,9 +225,10 @@ export class AuthService {
       roles,
     };
 
+    const expiresIn = this.configService.get<string>('jwt.accessExpiresIn')!;
     return this.jwtService.sign(payload, {
       secret: this.configService.get<string>('jwt.accessSecret')!,
-      expiresIn: this.configService.get<string>('jwt.accessExpiresIn')!,
+      expiresIn: expiresIn as StringValue | number,
     });
   }
 
@@ -241,9 +244,12 @@ export class AuthService {
       type: 'refresh',
     };
 
+    const refreshExpiresIn = this.configService.get<string>(
+      'jwt.refreshExpiresIn',
+    )!;
     const token = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('jwt.refreshSecret')!,
-      expiresIn: this.configService.get<string>('jwt.refreshExpiresIn')!,
+      expiresIn: refreshExpiresIn as StringValue | number,
     });
 
     const expiresIn = this.configService.get<string>('jwt.refreshExpiresIn')!;
