@@ -8,6 +8,7 @@ import { AppModule } from './app.module.js';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter.js';
 import { MongoExceptionFilter } from './common/filters/mongo-exception.filter.js';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor.js';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -16,16 +17,16 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
-  app.use(helmet());
+  app.use(helmet() as Parameters<typeof app.use>[0]);
 
   app.enableCors({
-    origin: configService.get('cors.origin'),
+    origin: configService.get<string>('cors.origin') || '*',
     credentials: true,
   });
 
-  app.use(compression());
+  app.use(compression() as Parameters<typeof app.use>[0]);
 
-  const apiPrefix = configService.get('app.apiPrefix');
+  const apiPrefix = configService.get<string>('app.apiPrefix') || 'api';
   app.setGlobalPrefix(apiPrefix);
 
   app.enableVersioning({
@@ -46,7 +47,14 @@ async function bootstrap() {
 
   app.useGlobalFilters(new HttpExceptionFilter(), new MongoExceptionFilter());
 
-  app.useGlobalInterceptors(new TransformInterceptor());
+  if (configService.get<boolean>('logging.enabled')) {
+    app.useGlobalInterceptors(
+      new LoggingInterceptor(),
+      new TransformInterceptor(),
+    );
+  } else {
+    app.useGlobalInterceptors(new TransformInterceptor());
+  }
 
   if (configService.get('swagger.enabled')) {
     const config = new DocumentBuilder()
@@ -82,15 +90,15 @@ async function bootstrap() {
     );
   }
 
-  const port = configService.get('app.port');
+  const port = configService.get<number>('app.port') || 3000;
   await app.listen(port);
 
   console.log(`
     Application is running on: http://localhost:${port}/${apiPrefix}/v1
     Swagger documentation: http://localhost:${port}/${apiPrefix}/docs
     Health check: http://localhost:${port}/${apiPrefix}/v1/health
-    Environment: ${configService.get('app.environment')}
+    Environment: ${configService.get<string>('app.environment') || 'development'}
   `);
 }
 
-bootstrap();
+void bootstrap();

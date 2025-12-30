@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import type { StringValue } from 'ms';
 import { AuthService } from './auth.service.js';
 import { AuthController } from './auth.controller.js';
 import { JwtStrategy } from './strategies/jwt.strategy.js';
@@ -24,7 +25,7 @@ import { UsersModule } from '../users/users.module.js';
         return {
           secret: configService.get<string>('jwt.accessSecret')!,
           signOptions: {
-            expiresIn: expiresIn as any,
+            expiresIn: expiresIn as StringValue | number,
           },
         };
       },

@@ -2,12 +2,12 @@ import {
   Injectable,
   ConflictException,
   UnauthorizedException,
-  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import type { StringValue } from 'ms';
 import { UsersRepository } from '../users/users.repository.js';
 import { RegisterDto } from './dto/register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
@@ -18,6 +18,7 @@ import {
   JwtPayload,
   RefreshTokenPayload,
 } from '../common/interfaces/jwt-payload.interface.js';
+import { Role } from '../common/constants/role.enum.js';
 import {
   RefreshToken,
   RefreshTokenDocument,
@@ -114,14 +115,20 @@ export class AuthService {
       ipAddress,
     );
 
-    const userObject: any = user.toObject();
+    const userObject = user.toObject();
 
     return {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
       user: new UserResponseDto({
-        ...userObject,
         _id: userObject._id.toString(),
+        email: userObject.email,
+        firstName: userObject.firstName,
+        lastName: userObject.lastName,
+        roles: userObject.roles,
+        isActive: userObject.isActive,
+        createdAt: userObject.createdAt,
+        updatedAt: userObject.updatedAt,
       }),
       tokenType: 'Bearer',
       expiresIn: this.getAccessTokenExpiresIn(),
@@ -176,7 +183,7 @@ export class AuthService {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
       };
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException(MESSAGES.AUTH.INVALID_TOKEN);
     }
   }
@@ -193,7 +200,7 @@ export class AuthService {
   private async generateTokens(
     userId: string,
     email: string,
-    roles: string[],
+    roles: Role[],
     userAgent?: string,
     ipAddress?: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
@@ -210,18 +217,18 @@ export class AuthService {
   private generateAccessToken(
     userId: string,
     email: string,
-    roles: string[],
+    roles: Role[],
   ): string {
     const payload: JwtPayload = {
       sub: userId,
       email,
-      roles: roles as any[],
+      roles,
     };
 
     const expiresIn = this.configService.get<string>('jwt.accessExpiresIn')!;
-    return this.jwtService.sign(payload as any, {
+    return this.jwtService.sign(payload, {
       secret: this.configService.get<string>('jwt.accessSecret')!,
-      expiresIn: expiresIn as any,
+      expiresIn: expiresIn as StringValue | number,
     });
   }
 
@@ -240,9 +247,9 @@ export class AuthService {
     const refreshExpiresIn = this.configService.get<string>(
       'jwt.refreshExpiresIn',
     )!;
-    const token = this.jwtService.sign(payload as any, {
+    const token = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('jwt.refreshSecret')!,
-      expiresIn: refreshExpiresIn as any,
+      expiresIn: refreshExpiresIn as StringValue | number,
     });
 
     const expiresIn = this.configService.get<string>('jwt.refreshExpiresIn')!;

@@ -17,10 +17,10 @@ export class TransformInterceptor<T> implements NestInterceptor<
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<ApiResponse<T>> {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<{ url: string }>();
 
     return next.handle().pipe(
-      map((data) => ({
+      map((data: T) => ({
         success: true,
         data,
         timestamp: new Date().toISOString(),

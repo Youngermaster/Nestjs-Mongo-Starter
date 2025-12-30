@@ -34,10 +34,13 @@ export class TasksRepository {
     userId: string,
     updateTaskDto: UpdateTaskDto,
   ): Promise<TaskDocument | null> {
-    const updateData: any = { ...updateTaskDto };
+    const { dueDate, ...restDto } = updateTaskDto;
+    const updateData: Partial<Task> & { completedAt?: Date } = {
+      ...restDto,
+    };
 
-    if (updateTaskDto.dueDate) {
-      updateData.dueDate = new Date(updateTaskDto.dueDate);
+    if (dueDate) {
+      updateData.dueDate = new Date(dueDate);
     }
 
     if (
@@ -64,15 +67,16 @@ export class TasksRepository {
 
   async findWithPagination(
     userId: string,
-    filter: any,
+    filter: Record<string, unknown>,
     page: number,
     limit: number,
     sortBy: string = 'createdAt',
     sortOrder: 'asc' | 'desc' = 'desc',
   ): Promise<{ data: TaskDocument[]; total: number }> {
     const skip = (page - 1) * limit;
-    const sort: any = {};
-    sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    const sort: Record<string, 1 | -1> = {
+      [sortBy]: sortOrder === 'asc' ? 1 : -1,
+    };
 
     const query = { ...filter, userId: new Types.ObjectId(userId) };
 

@@ -50,15 +50,16 @@ export class UsersRepository {
   }
 
   async findWithPagination(
-    filter: any,
+    filter: Record<string, unknown>,
     page: number,
     limit: number,
     sortBy: string = 'createdAt',
     sortOrder: 'asc' | 'desc' = 'desc',
   ): Promise<{ data: UserDocument[]; total: number }> {
     const skip = (page - 1) * limit;
-    const sort: any = {};
-    sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    const sort: Record<string, 1 | -1> = {
+      [sortBy]: sortOrder === 'asc' ? 1 : -1,
+    };
 
     const [data, total] = await Promise.all([
       this.userModel.find(filter).sort(sort).skip(skip).limit(limit).exec(),
