@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, FilterQuery } from 'mongoose';
+import { Model } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
@@ -52,7 +52,7 @@ export class UsersRepository {
   }
 
   async findWithPagination(
-    filter: FilterQuery<UserDocument>,
+    filter: any,
     page: number,
     limit: number,
     sortBy: string = 'createdAt',

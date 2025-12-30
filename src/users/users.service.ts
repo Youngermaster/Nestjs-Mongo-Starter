@@ -9,8 +9,6 @@ import { UpdateUserDto } from './dto/update-user.dto.js';
 import { UserResponseDto } from './dto/user-response.dto.js';
 import { QueryUserDto } from './dto/query-user.dto.js';
 import { ResponseUtil } from '../common/utils/response.util.js';
-import { FilterQuery } from 'mongoose';
-import { UserDocument } from './schemas/user.schema.js';
 import { MESSAGES } from '../common/constants/messages.constant.js';
 
 @Injectable()
@@ -27,13 +25,17 @@ export class UsersService {
     }
 
     const user = await this.usersRepository.create(createUserDto);
-    return new UserResponseDto(user.toObject());
+    const userObj = user.toObject();
+    return new UserResponseDto({
+      ...userObj,
+      _id: userObj._id.toString(),
+    });
   }
 
   async findAll(queryDto: QueryUserDto) {
-    const { page, limit, sortBy, sortOrder, email, isActive } = queryDto;
+    const { page = 1, limit = 10, sortBy, sortOrder, email, isActive } = queryDto;
 
-    const filter: FilterQuery<UserDocument> = {};
+    const filter: any = {};
     if (email) filter.email = email;
     if (isActive !== undefined) filter.isActive = isActive;
 
@@ -45,7 +47,13 @@ export class UsersService {
       sortOrder,
     );
 
-    const users = data.map((user) => new UserResponseDto(user.toObject()));
+    const users = data.map((user) => {
+      const userObj = user.toObject();
+      return new UserResponseDto({
+        ...userObj,
+        _id: userObj._id.toString(),
+      });
+    });
 
     return ResponseUtil.paginated(users, page, limit, total);
   }
@@ -57,7 +65,11 @@ export class UsersService {
       throw new NotFoundException(MESSAGES.USER.NOT_FOUND);
     }
 
-    return new UserResponseDto(user.toObject());
+    const userObj = user.toObject();
+    return new UserResponseDto({
+      ...userObj,
+      _id: userObj._id.toString(),
+    });
   }
 
   async findByEmail(email: string): Promise<UserResponseDto> {
@@ -67,7 +79,11 @@ export class UsersService {
       throw new NotFoundException(MESSAGES.USER.NOT_FOUND);
     }
 
-    return new UserResponseDto(user.toObject());
+    const userObj = user.toObject();
+    return new UserResponseDto({
+      ...userObj,
+      _id: userObj._id.toString(),
+    });
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {
@@ -77,7 +93,11 @@ export class UsersService {
       throw new NotFoundException(MESSAGES.USER.NOT_FOUND);
     }
 
-    return new UserResponseDto(user.toObject());
+    const userObj = user.toObject();
+    return new UserResponseDto({
+      ...userObj,
+      _id: userObj._id.toString(),
+    });
   }
 
   async remove(id: string): Promise<void> {

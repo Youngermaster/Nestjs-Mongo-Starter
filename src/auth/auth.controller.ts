@@ -13,7 +13,7 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { Request } from 'express';
+import type { Request } from 'express';
 import { AuthService } from './auth.service.js';
 import { RegisterDto } from './dto/register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
@@ -21,7 +21,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto.js';
 import { AuthResponseDto } from './dto/auth-response.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
-import { UserDocument } from '../users/schemas/user.schema.js';
+import type { UserDocument } from '../users/schemas/user.schema.js';
 import { Public } from '../common/decorators/public.decorator.js';
 
 @ApiTags('auth')

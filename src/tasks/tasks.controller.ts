@@ -24,7 +24,7 @@ import { QueryTaskDto } from './dto/query-task.dto.js';
 import { TaskResponseDto } from './dto/task-response.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
-import { UserDocument } from '../users/schemas/user.schema.js';
+import type { UserDocument } from '../users/schemas/user.schema.js';
 
 @ApiTags('tasks')
 @Controller('tasks')

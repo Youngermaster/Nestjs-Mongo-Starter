@@ -77,7 +77,7 @@ UserSchema.virtual('fullName').get(function (this: UserDocument) {
 
 UserSchema.set('toJSON', {
   virtuals: true,
-  transform: function (doc, ret) {
+  transform: function (doc, ret: any) {
     delete ret.password;
     delete ret.__v;
     return ret;
@@ -86,7 +86,7 @@ UserSchema.set('toJSON', {
 
 UserSchema.set('toObject', {
   virtuals: true,
-  transform: function (doc, ret) {
+  transform: function (doc, ret: any) {
     delete ret.password;
     delete ret.__v;
     return ret;

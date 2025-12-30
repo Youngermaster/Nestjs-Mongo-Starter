@@ -53,9 +53,9 @@ async function bootstrap() {
 
   if (configService.get('swagger.enabled')) {
     const config = new DocumentBuilder()
-      .setTitle(configService.get('swagger.title'))
-      .setDescription(configService.get('swagger.description'))
-      .setVersion(configService.get('swagger.version'))
+      .setTitle(configService.get<string>('swagger.title')!)
+      .setDescription(configService.get<string>('swagger.description')!)
+      .setVersion(configService.get<string>('swagger.version')!)
       .addBearerAuth(
         {
           type: 'http',
@@ -73,7 +73,7 @@ async function bootstrap() {
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup(configService.get('swagger.path'), app, document, {
+    SwaggerModule.setup(configService.get<string>('swagger.path')!, app, document, {
       swaggerOptions: {
         persistAuthorization: true,
       },

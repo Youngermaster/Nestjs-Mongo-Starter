@@ -22,7 +22,7 @@ import { UserResponseDto } from './dto/user-response.dto.js';
 import { QueryUserDto } from './dto/query-user.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
-import { UserDocument } from './schemas/user.schema.js';
+import type { UserDocument } from './schemas/user.schema.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
 import { Role } from '../common/constants/role.enum.js';

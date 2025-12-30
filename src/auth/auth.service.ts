@@ -35,7 +35,7 @@ export class AuthService {
       throw new ConflictException(MESSAGES.AUTH.EMAIL_ALREADY_EXISTS);
     }
 
-    const saltRounds = this.configService.get<number>('bcrypt.saltRounds');
+    const saltRounds = this.configService.get<number>('bcrypt.saltRounds')!;
     const hashedPassword = await BcryptUtil.hash(registerDto.password, saltRounds);
 
     const user = await this.usersRepository.create({
@@ -45,10 +45,15 @@ export class AuthService {
 
     const tokens = await this.generateTokens(user._id.toString(), user.email, user.roles, userAgent, ipAddress);
 
+    const userObj = user.toObject();
+
     return {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
-      user: new UserResponseDto(user.toObject()),
+      user: new UserResponseDto({
+        ...userObj,
+        _id: userObj._id.toString(),
+      }),
       tokenType: 'Bearer',
       expiresIn: this.getAccessTokenExpiresIn(),
     };
@@ -75,13 +80,15 @@ export class AuthService {
 
     const tokens = await this.generateTokens(user._id.toString(), user.email, user.roles, userAgent, ipAddress);
 
-    const userObject = user.toObject();
-    delete userObject.password;
+    const userObject: any = user.toObject();
 
     return {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
-      user: new UserResponseDto(userObject),
+      user: new UserResponseDto({
+        ...userObject,
+        _id: userObject._id.toString(),
+      }),
       tokenType: 'Bearer',
       expiresIn: this.getAccessTokenExpiresIn(),
     };
@@ -160,9 +167,10 @@ export class AuthService {
       roles: roles as any[],
     };
 
-    return this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('jwt.accessSecret'),
-      expiresIn: this.configService.get<string>('jwt.accessExpiresIn'),
+    const expiresIn = this.configService.get<string>('jwt.accessExpiresIn')!;
+    return this.jwtService.sign(payload as any, {
+      secret: this.configService.get<string>('jwt.accessSecret')!,
+      expiresIn: expiresIn as any,
     });
   }
 
@@ -178,12 +186,13 @@ export class AuthService {
       type: 'refresh',
     };
 
-    const token = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('jwt.refreshSecret'),
-      expiresIn: this.configService.get<string>('jwt.refreshExpiresIn'),
+    const refreshExpiresIn = this.configService.get<string>('jwt.refreshExpiresIn')!;
+    const token = this.jwtService.sign(payload as any, {
+      secret: this.configService.get<string>('jwt.refreshSecret')!,
+      expiresIn: refreshExpiresIn as any,
     });
 
-    const expiresIn = this.configService.get<string>('jwt.refreshExpiresIn');
+    const expiresIn = this.configService.get<string>('jwt.refreshExpiresIn')!;
     const expiresAt = this.calculateExpirationDate(expiresIn);
 
     await this.refreshTokenModel.create({
@@ -235,7 +244,7 @@ export class AuthService {
   }
 
   private getAccessTokenExpiresIn(): number {
-    const expiresIn = this.configService.get<string>('jwt.accessExpiresIn');
+    const expiresIn = this.configService.get<string>('jwt.accessExpiresIn')!;
     const match = expiresIn.match(/^(\d+)([smhd])$/);
 
     if (!match) {

@@ -16,12 +16,15 @@ import { UsersModule } from '../users/users.module.js';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('jwt.accessSecret'),
-        signOptions: {
-          expiresIn: configService.get<string>('jwt.accessExpiresIn'),
-        },
-      }),
+      useFactory: (configService: ConfigService) => {
+        const expiresIn = configService.get<string>('jwt.accessExpiresIn')!;
+        return {
+          secret: configService.get<string>('jwt.accessSecret')!,
+          signOptions: {
+            expiresIn: expiresIn as any,
+          },
+        };
+      },
       inject: [ConfigService],
     }),
     MongooseModule.forFeature([

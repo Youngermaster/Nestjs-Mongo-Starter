@@ -1,6 +1,6 @@
 export default () => ({
   app: {
-    port: parseInt(process.env.PORT, 10) || 3000,
+    port: parseInt(process.env.PORT || '3000', 10) || 3000,
     environment: process.env.NODE_ENV || 'development',
     apiPrefix: process.env.API_PREFIX || 'api',
   },
@@ -14,7 +14,7 @@ export default () => ({
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   },
   bcrypt: {
-    saltRounds: parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) || 10,
+    saltRounds: parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10) || 10,
   },
   swagger: {
     enabled: process.env.SWAGGER_ENABLED !== 'false',

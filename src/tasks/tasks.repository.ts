@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, FilterQuery, Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Task, TaskDocument, TaskStatus } from './schemas/task.schema.js';
 import { CreateTaskDto } from './dto/create-task.dto.js';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
@@ -58,7 +58,7 @@ export class TasksRepository {
 
   async findWithPagination(
     userId: string,
-    filter: FilterQuery<TaskDocument>,
+    filter: any,
     page: number,
     limit: number,
     sortBy: string = 'createdAt',
