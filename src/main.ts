@@ -84,8 +84,9 @@ async function bootstrap() {
   await app.listen(port);
 
   console.log(`
-    Application is running on: http://localhost:${port}/${apiPrefix}
+    Application is running on: http://localhost:${port}/${apiPrefix}/v1
     Swagger documentation: http://localhost:${port}/${apiPrefix}/docs
+    Health check: http://localhost:${port}/${apiPrefix}/v1/health
     Environment: ${configService.get('app.environment')}
   `);
 }

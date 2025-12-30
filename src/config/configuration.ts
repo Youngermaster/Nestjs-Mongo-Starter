@@ -21,7 +21,7 @@ export default () => ({
     title: 'NestJS MongoDB Starter API',
     description: 'Enterprise-grade API documentation',
     version: '1.0',
-    path: 'api/docs',
+    path: 'docs',
   },
   cors: {
     enabled: process.env.CORS_ENABLED !== 'false',
