@@ -42,7 +42,7 @@ export class UsersService {
       isActive,
     } = queryDto;
 
-    const filter: any = {};
+    const filter: { email?: string; isActive?: boolean } = {};
     if (email) filter.email = email;
     if (isActive !== undefined) filter.isActive = isActive;
 

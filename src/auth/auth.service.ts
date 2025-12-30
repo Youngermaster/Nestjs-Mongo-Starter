@@ -2,7 +2,6 @@ import {
   Injectable,
   ConflictException,
   UnauthorizedException,
-  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -114,14 +113,20 @@ export class AuthService {
       ipAddress,
     );
 
-    const userObject: any = user.toObject();
+    const userObject = user.toObject();
 
     return {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
       user: new UserResponseDto({
-        ...userObject,
         _id: userObject._id.toString(),
+        email: userObject.email,
+        firstName: userObject.firstName,
+        lastName: userObject.lastName,
+        roles: userObject.roles,
+        isActive: userObject.isActive,
+        createdAt: userObject.createdAt,
+        updatedAt: userObject.updatedAt,
       }),
       tokenType: 'Bearer',
       expiresIn: this.getAccessTokenExpiresIn(),
@@ -176,7 +181,7 @@ export class AuthService {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
       };
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException(MESSAGES.AUTH.INVALID_TOKEN);
     }
   }
@@ -215,13 +220,12 @@ export class AuthService {
     const payload: JwtPayload = {
       sub: userId,
       email,
-      roles: roles as any[],
+      roles,
     };
 
-    const expiresIn = this.configService.get<string>('jwt.accessExpiresIn')!;
-    return this.jwtService.sign(payload as any, {
+    return this.jwtService.sign(payload, {
       secret: this.configService.get<string>('jwt.accessSecret')!,
-      expiresIn: expiresIn as any,
+      expiresIn: this.configService.get<string>('jwt.accessExpiresIn')!,
     });
   }
 
@@ -237,12 +241,9 @@ export class AuthService {
       type: 'refresh',
     };
 
-    const refreshExpiresIn = this.configService.get<string>(
-      'jwt.refreshExpiresIn',
-    )!;
-    const token = this.jwtService.sign(payload as any, {
+    const token = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('jwt.refreshSecret')!,
-      expiresIn: refreshExpiresIn as any,
+      expiresIn: this.configService.get<string>('jwt.refreshExpiresIn')!,
     });
 
     const expiresIn = this.configService.get<string>('jwt.refreshExpiresIn')!;

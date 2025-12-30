@@ -23,7 +23,7 @@ export class MongoExceptionFilter implements ExceptionFilter {
     } else if (exception.name === 'CastError') {
       status = HttpStatus.BAD_REQUEST;
       message = 'Invalid ID format';
-    } else if ((exception as any).code === 11000) {
+    } else if ('code' in exception && exception.code === 11000) {
       status = HttpStatus.CONFLICT;
       message = 'Duplicate key error';
     }

@@ -11,6 +11,76 @@ import { HttpExceptionFilter } from './../src/common/filters/http-exception.filt
 import { MongoExceptionFilter } from './../src/common/filters/mongo-exception.filter';
 import { TransformInterceptor } from './../src/common/interceptors/transform.interceptor';
 
+// Type definitions for API responses
+interface ApiResponse<T = unknown> {
+  success: boolean;
+  data: T;
+  timestamp?: string;
+  path?: string;
+  message?: string;
+}
+
+interface ApiErrorResponse {
+  success: boolean;
+  message: string;
+  error?: string;
+}
+
+interface ApiInfoData {
+  name: string;
+  version: string;
+  description: string;
+  endpoints: unknown[];
+}
+
+interface HealthData {
+  status: string;
+  timestamp: string;
+  uptime: number;
+  environment: string;
+}
+
+interface UserData {
+  _id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  roles: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface AuthData {
+  accessToken: string;
+  refreshToken: string;
+  user: UserData;
+}
+
+interface TaskData {
+  _id: string;
+  title: string;
+  description?: string;
+  status: string;
+  priority: string;
+  userId: string;
+  dueDate?: string;
+  tags: string[];
+  completedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface PaginatedData<T> {
+  data: T[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 describe('App E2E Tests', () => {
   let app: INestApplication<App>;
 
@@ -58,12 +128,13 @@ describe('App E2E Tests', () => {
           .get('/api/v1')
           .expect(200)
           .expect((res) => {
-            expect(res.body.success).toBe(true);
-            expect(res.body.data).toHaveProperty('name');
-            expect(res.body.data).toHaveProperty('version');
-            expect(res.body.data).toHaveProperty('description');
-            expect(res.body.data).toHaveProperty('endpoints');
-            expect(res.body.data.name).toBe('NestJS MongoDB Starter API');
+            const body = res.body as ApiResponse<ApiInfoData>;
+            expect(body.success).toBe(true);
+            expect(body.data).toHaveProperty('name');
+            expect(body.data).toHaveProperty('version');
+            expect(body.data).toHaveProperty('description');
+            expect(body.data).toHaveProperty('endpoints');
+            expect(body.data.name).toBe('NestJS MongoDB Starter API');
           });
       });
     });
@@ -74,12 +145,13 @@ describe('App E2E Tests', () => {
           .get('/api/v1/health')
           .expect(200)
           .expect((res) => {
-            expect(res.body.success).toBe(true);
-            expect(res.body.data.status).toBe('ok');
-            expect(res.body.data).toHaveProperty('timestamp');
-            expect(res.body.data).toHaveProperty('uptime');
-            expect(res.body.data).toHaveProperty('environment');
-            expect(typeof res.body.data.uptime).toBe('number');
+            const body = res.body as ApiResponse<HealthData>;
+            expect(body.success).toBe(true);
+            expect(body.data.status).toBe('ok');
+            expect(body.data).toHaveProperty('timestamp');
+            expect(body.data).toHaveProperty('uptime');
+            expect(body.data).toHaveProperty('environment');
+            expect(typeof body.data.uptime).toBe('number');
           });
       });
     });
@@ -93,7 +165,6 @@ describe('App E2E Tests', () => {
       lastName: 'User',
     };
 
-    let accessToken: string;
     let refreshToken: string;
 
     describe('POST /api/v1/auth/register - User Registration', () => {
@@ -103,16 +174,16 @@ describe('App E2E Tests', () => {
           .send(testUser)
           .expect(201)
           .expect((res) => {
-            expect(res.body.success).toBe(true);
-            expect(res.body.data).toHaveProperty('accessToken');
-            expect(res.body.data).toHaveProperty('refreshToken');
-            expect(res.body.data).toHaveProperty('user');
-            expect(res.body.data.user.email).toBe(testUser.email);
-            expect(res.body.data.user).not.toHaveProperty('password');
+            const body = res.body as ApiResponse<AuthData>;
+            expect(body.success).toBe(true);
+            expect(body.data).toHaveProperty('accessToken');
+            expect(body.data).toHaveProperty('refreshToken');
+            expect(body.data).toHaveProperty('user');
+            expect(body.data.user.email).toBe(testUser.email);
+            expect(body.data.user).not.toHaveProperty('password');
 
-            // Save tokens for subsequent tests
-            accessToken = res.body.data.accessToken;
-            refreshToken = res.body.data.refreshToken;
+            // Save refresh token for subsequent tests
+            refreshToken = body.data.refreshToken;
           });
       });
 
@@ -122,8 +193,9 @@ describe('App E2E Tests', () => {
           .send(testUser)
           .expect(409)
           .expect((res) => {
-            expect(res.body.success).toBe(false);
-            expect(res.body.message).toContain('already exists');
+            const body = res.body as ApiErrorResponse;
+            expect(body.success).toBe(false);
+            expect(body.message).toContain('already exists');
           });
       });
 
@@ -159,10 +231,11 @@ describe('App E2E Tests', () => {
           })
           .expect(200)
           .expect((res) => {
-            expect(res.body.success).toBe(true);
-            expect(res.body.data).toHaveProperty('accessToken');
-            expect(res.body.data).toHaveProperty('refreshToken');
-            expect(res.body.data.user.email).toBe(testUser.email);
+            const body = res.body as ApiResponse<AuthData>;
+            expect(body.success).toBe(true);
+            expect(body.data).toHaveProperty('accessToken');
+            expect(body.data).toHaveProperty('refreshToken');
+            expect(body.data.user.email).toBe(testUser.email);
           });
       });
 
@@ -175,7 +248,8 @@ describe('App E2E Tests', () => {
           })
           .expect(401)
           .expect((res) => {
-            expect(res.body.success).toBe(false);
+            const body = res.body as ApiErrorResponse;
+            expect(body.success).toBe(false);
           });
       });
 
@@ -197,9 +271,10 @@ describe('App E2E Tests', () => {
           .send({ refreshToken })
           .expect(200)
           .expect((res) => {
-            expect(res.body.success).toBe(true);
-            expect(res.body.data).toHaveProperty('accessToken');
-            expect(res.body.data).toHaveProperty('refreshToken');
+            const body = res.body as ApiResponse<AuthData>;
+            expect(body.success).toBe(true);
+            expect(body.data).toHaveProperty('accessToken');
+            expect(body.data).toHaveProperty('refreshToken');
           });
       });
 
@@ -228,7 +303,8 @@ describe('App E2E Tests', () => {
         .post('/api/v1/auth/register')
         .send(testUser);
 
-      accessToken = response.body.data.accessToken;
+      const body = response.body as ApiResponse<AuthData>;
+      accessToken = body.data.accessToken;
     });
 
     describe('GET /api/v1/users/me - Get Current User', () => {
@@ -238,9 +314,10 @@ describe('App E2E Tests', () => {
           .set('Authorization', `Bearer ${accessToken}`)
           .expect(200)
           .expect((res) => {
-            expect(res.body.success).toBe(true);
-            expect(res.body.data.email).toBe(testUser.email);
-            expect(res.body.data).not.toHaveProperty('password');
+            const body = res.body as ApiResponse<UserData>;
+            expect(body.success).toBe(true);
+            expect(body.data.email).toBe(testUser.email);
+            expect(body.data).not.toHaveProperty('password');
           });
       });
 
@@ -270,11 +347,12 @@ describe('App E2E Tests', () => {
           })
           .expect(201)
           .expect((res) => {
-            expect(res.body.success).toBe(true);
-            expect(res.body.data).toHaveProperty('_id');
-            expect(res.body.data.title).toBe('Test Task');
-            expect(res.body.data.status).toBe('TODO'); // Status defaults to TODO
-            taskId = res.body.data._id;
+            const body = res.body as ApiResponse<TaskData>;
+            expect(body.success).toBe(true);
+            expect(body.data).toHaveProperty('_id');
+            expect(body.data.title).toBe('Test Task');
+            expect(body.data.status).toBe('TODO'); // Status defaults to TODO
+            taskId = body.data._id;
           });
       });
 
@@ -284,14 +362,15 @@ describe('App E2E Tests', () => {
           .set('Authorization', `Bearer ${accessToken}`)
           .expect(200)
           .expect((res) => {
-            expect(res.body.success).toBe(true);
+            const body = res.body as ApiResponse<PaginatedData<TaskData>>;
+            expect(body.success).toBe(true);
             // Tasks endpoint returns paginated response
-            expect(res.body.data).toHaveProperty('data');
-            expect(res.body.data).toHaveProperty('meta');
-            expect(Array.isArray(res.body.data.data)).toBe(true);
-            expect(res.body.data.data.length).toBeGreaterThan(0);
-            expect(res.body.data.meta).toHaveProperty('page');
-            expect(res.body.data.meta).toHaveProperty('total');
+            expect(body.data).toHaveProperty('data');
+            expect(body.data).toHaveProperty('meta');
+            expect(Array.isArray(body.data.data)).toBe(true);
+            expect(body.data.data.length).toBeGreaterThan(0);
+            expect(body.data.meta).toHaveProperty('page');
+            expect(body.data.meta).toHaveProperty('total');
           });
       });
 
@@ -301,9 +380,10 @@ describe('App E2E Tests', () => {
           .set('Authorization', `Bearer ${accessToken}`)
           .expect(200)
           .expect((res) => {
-            expect(res.body.success).toBe(true);
-            expect(res.body.data._id).toBe(taskId);
-            expect(res.body.data.title).toBe('Test Task');
+            const body = res.body as ApiResponse<TaskData>;
+            expect(body.success).toBe(true);
+            expect(body.data._id).toBe(taskId);
+            expect(body.data.title).toBe('Test Task');
           });
       });
 
@@ -317,9 +397,10 @@ describe('App E2E Tests', () => {
           })
           .expect(200)
           .expect((res) => {
-            expect(res.body.success).toBe(true);
-            expect(res.body.data.title).toBe('Updated Task');
-            expect(res.body.data.status).toBe('IN_PROGRESS');
+            const body = res.body as ApiResponse<TaskData>;
+            expect(body.success).toBe(true);
+            expect(body.data.title).toBe('Updated Task');
+            expect(body.data.status).toBe('IN_PROGRESS');
           });
       });
 

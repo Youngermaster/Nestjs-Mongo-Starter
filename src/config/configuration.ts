@@ -27,4 +27,7 @@ export default () => ({
     enabled: process.env.CORS_ENABLED !== 'false',
     origin: process.env.CORS_ORIGIN || '*',
   },
+  logging: {
+    enabled: process.env.LOGGING_ENABLED !== 'false',
+  },
 });

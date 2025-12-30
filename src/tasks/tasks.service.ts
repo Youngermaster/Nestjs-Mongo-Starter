@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Types } from 'mongoose';
 import { TasksRepository } from './tasks.repository.js';
 import { CreateTaskDto } from './dto/create-task.dto.js';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
@@ -6,6 +7,21 @@ import { QueryTaskDto } from './dto/query-task.dto.js';
 import { TaskResponseDto } from './dto/task-response.dto.js';
 import { ResponseUtil } from '../common/utils/response.util.js';
 import { MESSAGES } from '../common/constants/messages.constant.js';
+import { TaskStatus, TaskPriority } from './schemas/task.schema.js';
+
+interface TaskObject {
+  _id: Types.ObjectId;
+  title: string;
+  description?: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  userId: Types.ObjectId;
+  dueDate?: Date;
+  tags: string[];
+  completedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 @Injectable()
 export class TasksService {
@@ -16,7 +32,7 @@ export class TasksService {
     createTaskDto: CreateTaskDto,
   ): Promise<TaskResponseDto> {
     const task = await this.tasksRepository.create(userId, createTaskDto);
-    const taskObj: any = task.toObject();
+    const taskObj = task.toObject() as TaskObject;
     return {
       ...taskObj,
       _id: taskObj._id.toString(),
@@ -36,7 +52,12 @@ export class TasksService {
       tags,
     } = queryDto;
 
-    const filter: any = {};
+    const filter: {
+      status?: TaskStatus;
+      priority?: TaskPriority;
+      $text?: { $search: string };
+      tags?: { $in: string[] };
+    } = {};
 
     if (status) {
       filter.status = status;
@@ -64,7 +85,7 @@ export class TasksService {
     );
 
     const tasks = data.map((task) => {
-      const taskObj: any = task.toObject();
+      const taskObj = task.toObject() as TaskObject;
       return {
         ...taskObj,
         _id: taskObj._id.toString(),
@@ -82,7 +103,7 @@ export class TasksService {
       throw new NotFoundException(MESSAGES.TASK.NOT_FOUND);
     }
 
-    const taskObj: any = task.toObject();
+    const taskObj = task.toObject() as TaskObject;
     return {
       ...taskObj,
       _id: taskObj._id.toString(),
@@ -101,7 +122,7 @@ export class TasksService {
       throw new NotFoundException(MESSAGES.TASK.NOT_FOUND);
     }
 
-    const taskObj: any = task.toObject();
+    const taskObj = task.toObject() as TaskObject;
     return {
       ...taskObj,
       _id: taskObj._id.toString(),
