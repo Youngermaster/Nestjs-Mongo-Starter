@@ -44,10 +44,7 @@ async function bootstrap() {
     }),
   );
 
-  app.useGlobalFilters(
-    new HttpExceptionFilter(),
-    new MongoExceptionFilter(),
-  );
+  app.useGlobalFilters(new HttpExceptionFilter(), new MongoExceptionFilter());
 
   app.useGlobalInterceptors(new TransformInterceptor());
 
@@ -73,11 +70,16 @@ async function bootstrap() {
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup(configService.get<string>('swagger.path')!, app, document, {
-      swaggerOptions: {
-        persistAuthorization: true,
+    SwaggerModule.setup(
+      configService.get<string>('swagger.path')!,
+      app,
+      document,
+      {
+        swaggerOptions: {
+          persistAuthorization: true,
+        },
       },
-    });
+    );
   }
 
   const port = configService.get('app.port');
