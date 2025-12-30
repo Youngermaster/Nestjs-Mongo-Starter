@@ -1,98 +1,315 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# NestJS MongoDB Starter
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Enterprise-grade NestJS starter project with MongoDB, JWT authentication (access + refresh tokens), Swagger documentation, and Task Management example domain.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- **JWT Authentication** - Complete authentication system with access and refresh tokens
+- **MongoDB Integration** - Mongoose ODM with proper indexing and schema validation
+- **Swagger/OpenAPI** - Comprehensive API documentation with interactive UI
+- **Task Management** - Example CRUD operations demonstrating best practices
+- **Docker Support** - Docker Compose setup for local MongoDB + Mongo Express
+- **Security Best Practices** - Helmet, CORS, bcrypt password hashing, input validation
+- **Repository Pattern** - Clean architecture with separation of concerns
+- **Global Error Handling** - Consistent error responses across the application
+- **Response Transformation** - Standardized API responses
+- **Role-Based Access Control** - User roles and permissions system
+- **Environment Configuration** - Type-safe configuration with validation
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Tech Stack
 
-## Project setup
+- **NestJS** 11.x - Progressive Node.js framework
+- **MongoDB** 7.x - NoSQL database
+- **Mongoose** 9.x - MongoDB ODM
+- **JWT** - JSON Web Tokens for authentication
+- **Passport** - Authentication middleware
+- **Swagger** - API documentation
+- **Docker** - Containerization
+- **TypeScript** - Type safety
+- **Class Validator** - DTO validation
+- **Helmet** - Security headers
+- **bcrypt** - Password hashing
 
-```bash
-$ pnpm install
-```
+## Prerequisites
 
-## Compile and run the project
+- Node.js 20+
+- pnpm (or npm/yarn)
+- Docker and Docker Compose (for local MongoDB)
 
-```bash
-# development
-$ pnpm run start
+## Getting Started
 
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
-```
-
-## Run tests
+### 1. Installation
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+pnpm install
 ```
 
-## Deployment
+### 2. Environment Setup
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Copy the example environment file:
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+cp .env.example .env
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Generate secure JWT secrets:
 
-## Resources
+```bash
+node -e "console.log('JWT_ACCESS_SECRET=' + require('crypto').randomBytes(32).toString('hex')); console.log('JWT_REFRESH_SECRET=' + require('crypto').randomBytes(32).toString('hex'))"
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+Update your `.env` file with the generated secrets.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### 3. Start MongoDB
 
-## Support
+```bash
+pnpm run docker:dev
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+This will start:
+- MongoDB on `localhost:27017`
+- Mongo Express on `localhost:8081` (admin/admin123)
 
-## Stay in touch
+### 4. Run the Application
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Development mode:
+```bash
+pnpm run start:dev
+```
+
+Production build:
+```bash
+pnpm run build
+pnpm run start:prod
+```
+
+### 5. Access the API
+
+- **API**: `http://localhost:3000/api`
+- **Swagger Documentation**: `http://localhost:3000/api/docs`
+- **Health Check**: `http://localhost:3000/api/health`
+
+## Environment Variables
+
+| Variable | Description | Example | Required |
+|----------|-------------|---------|----------|
+| `NODE_ENV` | Environment | `development` | No |
+| `PORT` | Application port | `3000` | No |
+| `API_PREFIX` | API prefix | `api` | No |
+| `MONGODB_URI` | MongoDB connection string | `mongodb://admin:password123@localhost:27017/nestjs-starter?authSource=admin` | Yes |
+| `JWT_ACCESS_SECRET` | Access token secret (32+ chars) | Generated value | Yes |
+| `JWT_REFRESH_SECRET` | Refresh token secret (32+ chars) | Generated value | Yes |
+| `JWT_ACCESS_EXPIRES_IN` | Access token expiration | `15m` | No |
+| `JWT_REFRESH_EXPIRES_IN` | Refresh token expiration | `7d` | No |
+| `BCRYPT_SALT_ROUNDS` | Password hashing rounds | `10` | No |
+| `SWAGGER_ENABLED` | Enable Swagger UI | `true` | No |
+| `CORS_ENABLED` | Enable CORS | `true` | No |
+| `CORS_ORIGIN` | CORS allowed origins | `*` | No |
+
+## Project Structure
+
+The project follows a feature-based modular architecture:
+
+- **config/** - Environment configuration with validation
+- **common/** - Shared utilities (decorators, guards, filters, interceptors, DTOs)
+- **auth/** - Authentication module (register, login, refresh, logout)
+- **users/** - User management module
+- **tasks/** - Task management module (example domain)
+
+Each module contains:
+- **schemas/** - Mongoose schemas
+- **dto/** - Data Transfer Objects with validation
+- **repository.ts** - Data access layer
+- **service.ts** - Business logic
+- **controller.ts** - HTTP endpoints
+- **module.ts** - Module configuration
+
+## Architecture Patterns
+
+### Repository Pattern
+
+Separates data access from business logic:
+
+src/users/users.repository.ts:1
+- Data access operations
+- MongoDB query execution
+- Database-specific logic
+
+src/users/users.service.ts:1
+- Business logic
+- DTO transformation
+- Error handling
+
+### DTO Validation
+
+All inputs are validated using class-validator:
+
+```typescript
+@IsEmail()
+@IsNotEmpty()
+email: string;
+
+@MinLength(8)
+@Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/)
+password: string;
+```
+
+### Response Transformation
+
+Standardized responses using global interceptor:
+
+```json
+{
+  "success": true,
+  "data": { ... },
+  "timestamp": "2025-12-30T...",
+  "path": "/api/endpoint"
+}
+```
+
+## Security Features
+
+### Password Security
+- bcrypt hashing with 10 salt rounds
+- Password complexity requirements
+- Passwords excluded from queries (`select: false`)
+
+### JWT Authentication
+- **Access Tokens**: 15-minute expiration
+- **Refresh Tokens**: 7-day expiration
+- **Token Rotation**: Refresh tokens rotated on use
+- **Database Storage**: Tokens stored for revocation
+- **Metadata Tracking**: IP address and user agent logged
+
+### HTTP Security
+- Helmet for security headers
+- CORS configuration
+- Input validation on all endpoints
+- MongoDB injection protection
+
+## Database Schema
+
+### User Model
+- email (unique, indexed)
+- firstName, lastName
+- password (hashed, select: false)
+- roles (array, default: [USER])
+- isActive, lastLoginAt, emailVerifiedAt
+- createdAt, updatedAt (timestamps)
+
+### RefreshToken Model
+- userId (ref: User)
+- token (unique, indexed)
+- expiresAt (with TTL index)
+- isRevoked, revokedAt
+- userAgent, ipAddress
+
+### Task Model
+- title, description
+- status (TODO, IN_PROGRESS, COMPLETED, ARCHIVED)
+- priority (LOW, MEDIUM, HIGH, URGENT)
+- userId (ref: User)
+- dueDate, tags, completedAt
+- createdAt, updatedAt
+
+## API Endpoints
+
+### Authentication
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | Register new user |
+| POST | `/api/auth/login` | Login user |
+| POST | `/api/auth/refresh` | Refresh access token |
+| POST | `/api/auth/logout` | Logout user |
+
+### Users
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/users/me` | Get current user | Protected |
+| GET | `/api/users` | List users | Admin |
+| GET | `/api/users/:id` | Get user by ID | Admin |
+| PUT | `/api/users/:id` | Update user | Protected |
+| DELETE | `/api/users/:id` | Delete user | Admin |
+
+### Tasks
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/tasks` | Create task | Protected |
+| GET | `/api/tasks` | List tasks (with filters) | Protected |
+| GET | `/api/tasks/:id` | Get task | Protected |
+| PUT | `/api/tasks/:id` | Update task | Protected |
+| DELETE | `/api/tasks/:id` | Delete task | Protected |
+
+### Example Usage
+
+**Register a new user:**
+
+```bash
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john.doe@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "password": "SecurePass123!"
+  }'
+```
+
+**Create a task:**
+
+```bash
+curl -X POST http://localhost:3000/api/tasks \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{
+    "title": "Complete project documentation",
+    "description": "Write comprehensive API docs",
+    "priority": "HIGH",
+    "tags": ["documentation"]
+  }'
+```
+
+## Testing
+
+```bash
+pnpm test          # Unit tests
+pnpm test:e2e      # E2E tests
+pnpm test:cov      # Coverage report
+```
+
+## Docker Commands
+
+```bash
+pnpm run docker:dev    # Start MongoDB + Mongo Express
+pnpm run docker:down   # Stop services
+pnpm run docker:logs   # View MongoDB logs
+```
+
+Access Mongo Express at `http://localhost:8081`:
+- Username: `admin`
+- Password: `admin123`
+
+## Best Practices Implemented
+
+- Feature-based module structure
+- Repository pattern for data access
+- DTO validation for all inputs
+- Service layer for business logic
+- Guards for authentication/authorization
+- Interceptors for response transformation
+- Filters for error handling
+- Environment-based configuration with validation
+- Database indexing for performance
+- Password hashing with bcrypt
+- JWT with token rotation
+- Swagger documentation
+- Health check endpoint
+- Docker support
+- TypeScript strict mode
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+UNLICENSED
